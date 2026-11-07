@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>FinishPronto | Workload Planner</title>
+    <title>FinishFast | Workload Planner</title>
     <style>
         /* Modern Dark Theme Palette */
         :root {
@@ -244,7 +244,7 @@
             border-radius: 50%;
         }
 
-        /* Bedtime Overrun Alert Banner */
+        /* Overrun Alert Banner */
         .overrun-alert {
             display: none;
             background: rgba(239, 68, 68, 0.12);
@@ -338,6 +338,36 @@
         .input-field:focus {
             border-color: var(--accent-blue);
             box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.2);
+        }
+
+        /* Class Tags Container */
+        .class-tags-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.4rem;
+            margin-top: 0.5rem;
+        }
+
+        .class-tag {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.4rem;
+            background: rgba(79, 70, 229, 0.2);
+            border: 1px solid rgba(79, 70, 229, 0.4);
+            color: #c7d2fe;
+            padding: 0.3rem 0.6rem;
+            border-radius: 20px;
+            font-size: 0.78rem;
+            font-weight: 600;
+        }
+
+        .class-tag-remove {
+            background: transparent;
+            border: none;
+            color: var(--accent-rose);
+            cursor: pointer;
+            font-size: 0.9rem;
+            line-height: 1;
         }
 
         /* Dynamic Subject Dropdown */
@@ -677,14 +707,14 @@
             opacity: 0.5;
         }
 
-        /* FOCUS MODE MODAL (DARK BLUE SOLID BACKGROUND, NO BLUR) */
+        /* FOCUS MODE MODAL */
         .focus-overlay {
             position: fixed;
             top: 0;
             left: 0;
             width: 100vw;
             height: 100vh;
-            background-color: var(--bg-main); /* #090d16 solid dark blue */
+            background-color: var(--bg-main);
             backdrop-filter: none !important;
             -webkit-backdrop-filter: none !important;
             z-index: 1000;
@@ -738,7 +768,7 @@
             stroke: var(--accent-blue);
             stroke-width: 12;
             stroke-linecap: round;
-            stroke-dasharray: 816.81; /* 2 * PI * 130 */
+            stroke-dasharray: 816.81;
             stroke-dashoffset: 0;
             transition: stroke-dashoffset 0.8s linear, stroke 0.3s ease;
         }
@@ -772,7 +802,7 @@
             flex-wrap: wrap;
         }
 
-        /* Generic Overlay Modals (Check-in & Bedtime Overrun) */
+        /* Generic Overlay Modals */
         .modal-overlay {
             position: fixed;
             top: 0;
@@ -834,12 +864,12 @@
 <body>
 
     <div class="app-container">
-        <!-- 1. Header with FinishPronto Branding & Target Bedtime -->
+        <!-- 1. Header with FinishFast Branding & Target Bedtime -->
         <header class="app-header">
             <div class="brand-section">
                 <div class="brand-logo">⚡</div>
                 <div>
-                    <h1 class="brand-title">FinishPronto</h1>
+                    <h1 class="brand-title">FinishFast</h1>
                     <p class="brand-subtitle">Workload & Focus Planner</p>
                 </div>
             </div>
@@ -908,7 +938,7 @@
             <div class="overrun-alert" id="overrunBanner">
                 <div class="overrun-header">
                     <div>
-                        <strong>⚠️ FinishPronto Bedtime Alert:</strong> Workload & commitments exceed bedtime by <span id="overrunMinsText">0</span> mins!
+                        <strong>⚠️ FinishFast Bedtime Alert:</strong> Workload & commitments exceed bedtime by <span id="overrunMinsText">0</span> mins!
                     </div>
                 </div>
                 <div class="overrun-actions">
@@ -1004,10 +1034,10 @@
                 </div>
 
                 <div class="filter-tabs">
-                    <button class="tab-btn active" onclick="setTaskFilter('all', this)">All Tasks</button>
-                    <button class="tab-btn" onclick="setTaskFilter('pending', this)">Pending</button>
-                    <button class="tab-btn" onclick="setTaskFilter('completed', this)">Completed</button>
-                    <button class="tab-btn" onclick="setTaskFilter('deferred', this)">Pushed / Deferred</button>
+                    <button class="tab-btn active" data-filter="all" onclick="setTaskFilter('all', this)">All Tasks</button>
+                    <button class="tab-btn" data-filter="pending" onclick="setTaskFilter('pending', this)">Pending</button>
+                    <button class="tab-btn" data-filter="completed" onclick="setTaskFilter('completed', this)">Completed</button>
+                    <button class="tab-btn" data-filter="deferred" onclick="setTaskFilter('deferred', this)">Pushed / Deferred</button>
                 </div>
 
                 <div class="task-list" id="taskList">
@@ -1017,11 +1047,11 @@
         </main>
     </div>
 
-    <!-- 4. FOCUS VIEW MODAL (DARK BLUE SOLID BG, NO BLUR, CIRCULAR COUNTDOWN RING) -->
+    <!-- 4. FOCUS VIEW MODAL -->
     <div class="focus-overlay" id="focusModal">
         <div class="focus-container">
             <div style="display: flex; align-items: center; gap: 0.5rem;">
-                <span style="font-size: 1.2rem; font-weight: 800; color: var(--accent-blue);">⚡ FinishPronto Focus Mode</span>
+                <span style="font-size: 1.2rem; font-weight: 800; color: var(--accent-blue);">⚡ FinishFast Focus Mode</span>
             </div>
 
             <div class="focus-card-info">
@@ -1113,11 +1143,8 @@
         /* Application State */
         let appState = {
             bedtime: "23:00",
-            savedClasses: ["Math", "English", "History", "Science"],
-            commitments: [
-                { id: "c1", title: "Dinner", minutes: 45 },
-                { id: "c2", title: "Shower", minutes: 20 }
-            ],
+            savedClasses: [],
+            commitments: [],
             tasks: [],
             activeFilter: "all",
             activeFocusTaskId: null,
@@ -1170,7 +1197,7 @@
 
         /* Storage Persistence */
         function loadLocalStorage() {
-            const saved = localStorage.getItem('finishpronto_state_v2');
+            const saved = localStorage.getItem('finishfast_state_v2');
             if (saved) {
                 try {
                     const parsed = JSON.parse(saved);
@@ -1178,36 +1205,18 @@
                 } catch (e) {
                     console.error("Failed to parse storage", e);
                 }
-            } else {
-                const todayStr = new Date().toISOString().split('T')[0];
-                appState.tasks = [
-                    {
-                        id: 't1',
-                        subject: 'Math',
-                        name: 'Problem Set #7',
-                        duration: 40,
-                        checkinInterval: 20,
-                        due: `${todayStr}T21:30`,
-                        status: 'pending'
-                    },
-                    {
-                        id: 't2',
-                        subject: 'Science',
-                        name: 'Chemistry Lab Analysis',
-                        duration: 50,
-                        checkinInterval: 20,
-                        due: `${todayStr}T22:15`,
-                        status: 'pending'
-                    }
-                ];
-                saveLocalStorage();
             }
+
+            // Explicit array integrity checks
+            appState.savedClasses = Array.isArray(appState.savedClasses) ? appState.savedClasses : [];
+            appState.commitments = Array.isArray(appState.commitments) ? appState.commitments : [];
+            appState.tasks = Array.isArray(appState.tasks) ? appState.tasks : [];
 
             bedtimeInput.value = appState.bedtime || "23:00";
         }
 
         function saveLocalStorage() {
-            localStorage.setItem('finishpronto_state_v2', JSON.stringify({
+            localStorage.setItem('finishfast_state_v2', JSON.stringify({
                 bedtime: appState.bedtime,
                 savedClasses: appState.savedClasses,
                 commitments: appState.commitments,
@@ -1242,9 +1251,34 @@
                 renderAll();
             });
 
-            // Subject / Class Dropdown
+            // Subject / Class Dropdown Input & Focus
             taskSubjectInput.addEventListener('focus', renderSubjectDropdown);
             taskSubjectInput.addEventListener('input', renderSubjectDropdown);
+
+            // Robust Event Delegation for Subject Dropdown
+            subjectDropdown.addEventListener('click', (e) => {
+                const deleteBtn = e.target.closest('.delete-subject-btn');
+                if (deleteBtn) {
+                    e.stopPropagation();
+                    const cls = deleteBtn.getAttribute('data-subject');
+                    if (cls) deleteSavedClass(cls);
+                    return;
+                }
+
+                const saveBtn = e.target.closest('.dropdown-save-btn');
+                if (saveBtn) {
+                    const cls = saveBtn.getAttribute('data-create-subject');
+                    if (cls) saveAndSelectClass(cls);
+                    return;
+                }
+
+                const item = e.target.closest('.dropdown-item');
+                if (item) {
+                    const cls = item.getAttribute('data-subject');
+                    if (cls) selectSubjectClass(cls);
+                    return;
+                }
+            });
 
             document.addEventListener('click', (e) => {
                 if (!taskSubjectInput.contains(e.target) && !subjectDropdown.contains(e.target)) {
@@ -1294,9 +1328,14 @@
                         status: 'pending'
                     });
 
-                    document.getElementById('taskName').value = '';
-                    document.getElementById('taskDuration').value = '';
+                    // Reset form and re-initialize default deadline
+                    taskForm.reset();
+                    setDefaultDueDate();
                     subjectDropdown.classList.remove('open');
+
+                    // Reset active filter to 'all' so new task is immediately visible
+                    appState.activeFilter = 'all';
+                    updateTabButtonsUI();
 
                     saveLocalStorage();
                     renderAll();
@@ -1310,25 +1349,27 @@
             const filter = inputVal.toLowerCase();
             
             let html = '';
-            const matches = appState.savedClasses.filter(c => c.toLowerCase().includes(filter));
+            const classes = appState.savedClasses || [];
+            const matches = classes.filter(c => c.toLowerCase().includes(filter));
 
             if (matches.length > 0) {
                 matches.forEach(cls => {
                     html += `
-                        <div class="dropdown-item" onclick="selectSubjectClass('${escapeHtml(cls)}')">
+                        <div class="dropdown-item" data-subject="${escapeHtml(cls)}">
                             <span>📚 ${escapeHtml(cls)}</span>
-                            <button type="button" class="btn-icon-danger" onclick="deleteSavedClass(event, '${escapeHtml(cls)}')">×</button>
+                            <button type="button" class="btn-icon-danger delete-subject-btn" data-subject="${escapeHtml(cls)}" title="Delete Subject">×</button>
                         </div>`;
                 });
             }
 
-            if (inputVal && !appState.savedClasses.some(c => c.toLowerCase() === filter)) {
+            const exactMatch = classes.some(c => c.toLowerCase() === filter);
+            if (inputVal && !exactMatch) {
                 html += `
-                    <div class="dropdown-save-btn" onclick="saveAndSelectClass('${escapeHtml(inputVal)}')">
-                        ➕ Save "${escapeHtml(inputVal)}"
+                    <div class="dropdown-save-btn" data-create-subject="${escapeHtml(inputVal)}">
+                        ➕ Create new subject: "${escapeHtml(inputVal)}"
                     </div>`;
             } else if (!inputVal && matches.length === 0) {
-                html += `<div class="dropdown-empty">Type a class name to save it</div>`;
+                html += `<div class="dropdown-empty">No subjects saved yet. Type to create one!</div>`;
             }
 
             subjectDropdown.innerHTML = html;
@@ -1341,16 +1382,16 @@
         }
 
         function saveAndSelectClass(cls) {
-            if (!appState.savedClasses.includes(cls)) {
-                appState.savedClasses.push(cls);
+            const trimmed = cls.trim();
+            if (trimmed && !appState.savedClasses.some(c => c.toLowerCase() === trimmed.toLowerCase())) {
+                appState.savedClasses.push(trimmed);
                 saveLocalStorage();
             }
-            selectSubjectClass(cls);
+            selectSubjectClass(trimmed);
         }
 
-        function deleteSavedClass(event, cls) {
-            event.stopPropagation();
-            appState.savedClasses = appState.savedClasses.filter(c => c !== cls);
+        function deleteSavedClass(cls) {
+            appState.savedClasses = appState.savedClasses.filter(c => c.toLowerCase() !== cls.toLowerCase());
             saveLocalStorage();
             renderSubjectDropdown();
         }
@@ -1422,16 +1463,25 @@
             }
         }
 
-        /* Sort Tasks by Urgency (Earliest Deadline First) */
+        /* Sort Tasks by Urgency */
         function getSortedTasks() {
             return [...appState.tasks].sort((a, b) => new Date(a.due).getTime() - new Date(b.due).getTime());
         }
 
         function setTaskFilter(filter, el) {
             appState.activeFilter = filter;
-            document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
-            el.classList.add('active');
+            updateTabButtonsUI();
             renderTasks();
+        }
+
+        function updateTabButtonsUI() {
+            document.querySelectorAll('.tab-btn').forEach(btn => {
+                if (btn.getAttribute('data-filter') === appState.activeFilter) {
+                    btn.classList.add('active');
+                } else {
+                    btn.classList.remove('active');
+                }
+            });
         }
 
         /* Render All UI */
@@ -1631,7 +1681,6 @@
             const s = appState.focusTimerSeconds % 60;
             focusTimerDisplay.textContent = `${String(m).padStart(2, '0')}:${String(s).padStart(2, '0')}`;
 
-            // Smooth SVG Circular Ring Countdown Update
             const fraction = appState.focusTotalDurationSeconds > 0 
                 ? (appState.focusTimerSeconds / appState.focusTotalDurationSeconds) 
                 : 0;
@@ -1683,7 +1732,7 @@
                 completeFocusTask();
             } else if (action === 'snooze') {
                 appState.isTimerPaused = false;
-                appState.checkinTimerSeconds = 5 * 60; // Snooze 5 mins
+                appState.checkinTimerSeconds = 5 * 60;
             } else if (action === 'defer') {
                 if (appState.activeFocusTaskId) {
                     const task = appState.tasks.find(t => t.id === appState.activeFocusTaskId);
